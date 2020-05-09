@@ -1,0 +1,847 @@
+{
+	"info": {
+		"_postman_id": "7ce6ae62-f19d-4d96-be5b-028e7221d410",
+		"name": "SegundaMano",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Crear usuario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "350b48ca-16ae-400e-a8e8-b577544b6c99",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"//Setea valores del response",
+							"var jsonData = pm.response.json();",
+							"pm.environment.set(\"accessToken\", jsonData.access_token);",
+							"pm.environment.set(\"account_id\", jsonData.account.account_id);",
+							"pm.environment.set(\"name\", jsonData.account.name);",
+							"pm.environment.set(\"uuid\", jsonData.account.uuid);",
+							"",
+							"let messageString = jsonData.account.account_id;",
+							"postman.setEnvironmentVariable(\"user\", messageString.split('/')[3]);",
+							"console.log(messageString.split('/')[3]);",
+							"    ",
+							"pm.test(\"Validate email\", function () {",
+							"    var email = pm.environment.get(\"email\");",
+							"    pm.expect(jsonData.account.email).to.eql(email);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ab0e7f2d-85fb-42a1-aeeb-f52694afc917",
+						"exec": [
+							"let user = \"user\" + (Math.floor(Math.random() * 7685 + 3)) + \"@ventas.com\";",
+							"let pass = (Math.floor(Math.random() * 57684) + 10000);",
+							"",
+							"console.log(user,pass);",
+							"pm.environment.set(\"email\", user);",
+							"",
+							"let encodedKeys = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(user + \":\" + pass));",
+							"",
+							"console.log(user + \":\" + pass);",
+							"console.log(encodedKeys);",
+							"",
+							"pm.environment.set(\"encoded\", encodedKeys);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{encoded}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Origin",
+						"value": "https://www.segundamano.mx",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"account\":\n\t{\"email\":\"{{email}}\"}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1.1/private/accounts",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1.1",
+						"private",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Agregar Telefono",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "25e8601c-8697-4530-89da-8d1564927dcd",
+						"exec": [
+							"pm.environment.set(\"phone\",(_.random(11111111,99999999)));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "28cb4c2b-7be9-4d01-86cb-60e1f3bf174e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "tag:scmcoord.com,2013:api {{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"account\":\n\t{\n\t\t\"name\":\"{{name}}\",\n\t\t\"phone\":\"{{phone}}\",\n\t\t\"phone_hidden\": true\n\t}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1{{account_id}}",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1{{account_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Anuncio",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aa1dacc1-2fd0-45d2-94dc-c781647f59cf",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"postman.setEnvironmentVariable(\"ad\", jsonData.ad.ad_id);",
+							"",
+							"let messageString = jsonData.action.action_id",
+							"pm.environment.set(\"ad\", messageString.split('/')[5])",
+							"",
+							"pm.test(\"Validate Action Type = new\", function () {",
+							"    pm.expect(jsonData.action.action_type).to.eql(\"new\");",
+							"});",
+							"",
+							"pm.test(\"Validate Ad subject\", function () {",
+							"    pm.expect(jsonData.ad.subject).to.eql(\"Juego de cubiertos\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f540c7ff-06d8-45ea-a6bd-fdc951a0f62e",
+						"exec": [
+							"texto = Math.random().toString(36).substring(2,15) + Math.random().toString(36).substring(2,15);",
+							"",
+							"console.log(Math.random().toString(36).substring(2,24))",
+							"pm.environment.set(\"Texto\", texto);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "authority",
+						"value": "webapi.segundamano.mx",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "tag:scmcoord.com,2013:api {{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "x-nga-source",
+						"value": "PHOENIX_DESKTOP",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"ad\":{\r\n      \"locations\":[\r\n         {\r\n            \"code\":\"5\",\r\n            \"key\":\"region\",\r\n            \"label\":\"Baja California Sur\",\r\n            \"locations\":[\r\n               {\r\n                  \"code\":\"51\",\r\n                  \"key\":\"municipality\",\r\n                  \"label\":\"Comondú\",\r\n                  \"locations\":[\r\n                     {\r\n                        \"code\":\"3730\",\r\n                        \"key\":\"area\",\r\n                        \"label\":\"Benito Juárez\"\r\n                     }\r\n                  ]\r\n               }\r\n            ]\r\n         }\r\n      ],\r\n      \"subject\":\"Juego de cubiertos\",\r\n      \"body\":\"Juego de cubiertos para cocina {{Texto}}\",\r\n      \"category\":{\r\n         \"code\":\"3042\"\r\n      },\r\n      \"images\":[\r\n\r\n      ],\r\n      \"price\":{\r\n         \"currency\":\"mxn\",\r\n         \"price_value\":350\r\n      },\r\n      \"ad_details\":{\r\n\r\n      },\r\n      \"phone_hidden\":1,\r\n      \"plate\":\"\",\r\n      \"vin\":\"\",\r\n      \"type\":{\r\n         \"code\":\"s\",\r\n         \"label\":\"\"\r\n      },\r\n      \"ad\":\"Juego de Cubiertos\"\r\n   },\r\n   \"category_suggestion\":false,\r\n   \"commit\":true\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1.7{{account_id}}/klfst?lang=es",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1.7{{account_id}}",
+						"klfst"
+					],
+					"query": [
+						{
+							"key": "lang",
+							"value": "es"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Editar Anuncio",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3e6c59c5-5cf0-418e-994f-14a4cb84bf4d",
+						"exec": [
+							"texto = Math.random().toString(36).substring(2,15) + Math.random().toString(36).substring(2,15);",
+							"console.log(Math.random().toString(36).substring(2,24));",
+							"pm.environment.set(\"Texto\", texto);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "aac48a1d-1236-420c-8300-663eff348551",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Validate Action Type = edit\", function () {",
+							"    pm.expect(jsonData.action.action_type).to.eql(\"edit\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "authority",
+						"value": "webapi.segundamano.mx",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "tag:scmcoord.com,2013:api {{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "x-nga-source",
+						"value": "PHOENIX_DESKTOP",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"ad\":{\r\n      \"locations\":[\r\n         {\r\n            \"code\":\"5\",\r\n            \"key\":\"region\",\r\n            \"label\":\"Baja California Sur\",\r\n            \"locations\":[\r\n               {\r\n                  \"code\":\"51\",\r\n                  \"key\":\"municipality\",\r\n                  \"label\":\"Comondú\",\r\n                  \"locations\":[\r\n                     {\r\n                        \"code\":\"3730\",\r\n                        \"key\":\"area\",\r\n                        \"label\":\"Benito Juárez\"\r\n                     }\r\n                  ]\r\n               }\r\n            ]\r\n         }\r\n      ],\r\n      \"subject\":\"Juego de cubiertos\",\r\n      \"body\":\"Juego de cubiertos para cocina {{Texto}}\",\r\n      \"category\":{\r\n         \"code\":\"3042\"\r\n      },\r\n      \"images\":[\r\n\r\n      ],\r\n      \"price\":{\r\n         \"currency\":\"MXN\",\r\n         \"price_value\":750\r\n      },\r\n      \"ad_details\":{\r\n\r\n      },\r\n      \"phone_hidden\":1,\r\n      \"type\":{\r\n         \"code\":\"s\",\r\n         \"label\":\"Vendo\"\r\n      },\r\n      \"ad\":\"Juego de cucharones\"\r\n   },\r\n   \"category_suggestion\":false,\r\n   \"commit\":true\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1.7{{account_id}}/klfst/{{ad}}/actions",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1.7{{account_id}}",
+						"klfst",
+						"{{ad}}",
+						"actions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validar sin Dirección",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "38c6e86e-0858-4610-8e71-49be7a17ce58",
+						"exec": [
+							"var Token = pm.environment.get('accessToken');",
+							"var uid = pm.environment.get('uuid');",
+							"",
+							"console.log(uid + \":\" + Token);",
+							"let encodedkeys = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(uid + \":\" + Token));",
+							"",
+							"console.log(encodedkeys);",
+							"pm.environment.set(\"token2\", encodedkeys);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "5b8f91f2-a0fa-4ad1-9e81-280343a968c3",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{token2}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{base_url}}/addresses/v1/get",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"addresses",
+						"v1",
+						"get"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Agregar Dirección",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e2cd9014-c079-4b14-9b84-6811b55aa3ad",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"postman.setEnvironmentVariable(\"address_id\", jsonData.addressID);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f13acae3-51b0-49ef-9802-a54e1fc69a55",
+						"exec": [
+							"var Token = pm.environment.get('accessToken');",
+							"var uid = pm.environment.get('uuid');",
+							"",
+							"console.log(uid + \":\" + Token);",
+							"let encodedkeys = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(uid + \":\" + Token));",
+							"",
+							"console.log(encodedkeys);",
+							"pm.environment.set(\"token2\", encodedkeys);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{token2}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "contact",
+							"value": "Casa Grande",
+							"type": "text"
+						},
+						{
+							"key": "phone",
+							"value": "3366778899",
+							"type": "text"
+						},
+						{
+							"key": "rfc",
+							"value": "CASE090102",
+							"type": "text"
+						},
+						{
+							"key": "zipCode",
+							"value": "98101",
+							"type": "text"
+						},
+						{
+							"key": "exteriorInfo",
+							"value": "Lopez Mateos 890",
+							"type": "text"
+						},
+						{
+							"key": "region",
+							"value": "11",
+							"type": "text"
+						},
+						{
+							"key": "municipality",
+							"value": "296",
+							"type": "text"
+						},
+						{
+							"key": "alias",
+							"value": "Casa grande",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://{{base_url}}/addresses/v1/create",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"addresses",
+						"v1",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validar Dirección Creada",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f35a7e5a-f06b-41a2-ab80-9dadf9d7a65d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"",
+							"console.log(jsonData.addresses)",
+							"/*",
+							"",
+							"var jsonData = pm.response.json();",
+							"",
+							"let add_id = pm.environment.get('address_id');",
+							"let add_id2 = pm.environment.set(jsonData.addresses);",
+							"",
+							"",
+							"pm.test(\"Your test name\", function () {",
+							"    ",
+							"    pm.expect().to.eql(add_id);",
+							"});*/",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "34459ac1-c200-4c4c-8755-8f832d702efe",
+						"exec": [
+							"var Token = pm.environment.get('accessToken');",
+							"var uid = pm.environment.get('uuid');",
+							"",
+							"console.log(uid + \":\" + Token);",
+							"let encodedkeys = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(uid + \":\" + Token));",
+							"",
+							"console.log(encodedkeys);",
+							"pm.environment.set(\"token2\", encodedkeys);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{token2}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{base_url}}/addresses/v1/get",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"addresses",
+						"v1",
+						"get"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mensajes sin leer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c787199e-c873-4dd0-9cd1-9c2c450684e7",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Your test name\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.unread).to.eql(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "tag:scmcoord.com,2013:api {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1/api/users/{{uuid}}/counter",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1",
+						"api",
+						"users",
+						"{{uuid}}",
+						"counter"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Balance",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6b057887-17ca-466d-8713-ab57dc0fd6d8",
+						"exec": [
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ddc0fad2-55a6-47f9-ad6c-c8ab13b27b06",
+						"exec": [
+							"pm.test(\"Prueba con timeout\", function (done){",
+							"    setTimeout(() => {",
+							"        pm.expect(pm.response.code).to.equal(200);",
+							"        done();",
+							"    }, 3000);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{base_url}}/credits/v1{{account_id}}",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"credits",
+						"v1{{account_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ver Categorias",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c2cd6661-4226-447c-b0d6-0aa04ba44ce5",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1/public/categories/insert",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1",
+						"public",
+						"categories",
+						"insert"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Borrar Anuncio",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "26af3539-a991-40f7-8aa8-cb0bfd51d888",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "92283066-39af-4bd8-9ddb-88533ad2b83d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Validate Action Type = delete\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.action.action_type).to.eql(\"delete\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "authority",
+						"value": "webapi.segundamano.mx",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "tag:scmcoord.com,2013:api {{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "accept-language",
+						"value": "es",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"delete_reason\":{\r\n      \"code\":\"5\"\r\n   }\r\n}"
+				},
+				"url": {
+					"raw": "https://{{base_url}}/nga/api/v1{{account_id}}/klfst/{{ad}}",
+					"protocol": "https",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nga",
+						"api",
+						"v1{{account_id}}",
+						"klfst",
+						"{{ad}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
