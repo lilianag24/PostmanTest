@@ -796,7 +796,14 @@
 							"    console.log(\"Action_Type: \" + jsonData.action.action_type);",
 							"    pm.expect(jsonData.action.action_type).to.not.be.equal(\"new\");",
 							"});",
-							"/* END: 2020/05/09 CASOS DE PRUEBA AGREGADOS POR PEDRO */"
+							"",
+							"//\"code\": \"0\" //\"No lo vendí\"",
+							"//\"code\": \"1\" //\"Vendí gracias a Segundamano\"",
+							"//\"code\": \"2\" //\"Vendí gracias a otro sitio/app\"",
+							"//\"code\": \"5\" //\"Otra razón\"",
+							"",
+							"/* END: 2020/05/09 CASOS DE PRUEBA AGREGADOS POR PEDRO */",
+							""
 						],
 						"type": "text/javascript"
 					}
